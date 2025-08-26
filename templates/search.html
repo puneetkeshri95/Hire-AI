@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Candidates - HireAI</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+    <style>
+        /* Enhanced aesthetic styles for search.html */
+        .search-page {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 25% 25%, rgba(81, 207, 102, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(81, 207, 102, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .search-header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 50%, var(--bg-card) 100%);
+            padding: 4rem 0;
+            border-bottom: 1px solid var(--border-primary);
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .search-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 100%, rgba(81, 207, 102, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .hero-title {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-green) 50%, var(--text-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .datetime-display {
+            font-family: 'Inter', monospace;
+            background: linear-gradient(135deg, rgba(81, 207, 102, 0.2), rgba(81, 207, 102, 0.1));
+            border: 1px solid var(--accent-green);
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            box-shadow: 0 4px 16px rgba(81, 207, 102, 0.2);
+        }
+        
+        .search-container {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 100px;
+            backdrop-filter: blur(10px);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+        
+        .search-container:hover::before {
+            opacity: 1;
+        }
+        
+        .search-container:hover {
+            box-shadow: 0 12px 48px rgba(81, 207, 102, 0.15);
+        }
+        
+        .form-input {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border: 1px solid var(--border-primary);
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+        
+        .form-input:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(81, 207, 102, 0.15);
+            background: var(--bg-card);
+        }
+        
+        .enhanced-btn {
+            background: linear-gradient(135deg, var(--accent-green) 0%, #40c057 100%);
+            box-shadow: 0 4px 15px rgba(81, 207, 102, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--transition-smooth);
+        }
+        
+        .enhanced-btn:hover::before {
+            left: 100%;
+        }
+        
+        .enhanced-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(81, 207, 102, 0.4);
+        }
+        
+        .job-analysis {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .job-analysis::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+        
+        .job-analysis:hover::before {
+            opacity: 1;
+        }
+        
+        .candidate-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .candidate-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(81, 207, 102, 0.1), transparent);
+            transition: var(--transition-smooth);
+        }
+        
+        .candidate-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-green), #40c057, var(--accent-green));
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+        
+        .candidate-card:hover::before {
+            left: 100%;
+        }
+        
+        .candidate-card:hover::after {
+            opacity: 1;
+        }
+        
+        .candidate-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 48px rgba(81, 207, 102, 0.2);
+            border-color: var(--accent-green);
+        }
+        
+        .match-score {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-green), #40c057);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(81, 207, 102, 0.3);
+        }
+        
+        .skill-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
+            padding: 0.4rem 0.8rem;
+            margin: 0.25rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skill-tag::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(81, 207, 102, 0.2), transparent);
+            transition: var(--transition-smooth);
+        }
+        
+        .skill-tag:hover::before {
+            left: 100%;
+        }
+        
+        .skill-tag:hover {
+            background: linear-gradient(135deg, var(--accent-green), #40c057);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+            transform: translateY(-1px);
+        }
+        
+        .matched-skill {
+            background: linear-gradient(135deg, rgba(81, 207, 102, 0.2), rgba(81, 207, 102, 0.3));
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+        
+        .results-header {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .results-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-green), #40c057);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+        
+        .results-header:hover::before {
+            opacity: 1;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 3.5rem;
+            height: 3.5rem;
+            border: 4px solid var(--border-primary);
+            border-radius: 50%;
+            border-top-color: var(--accent-green);
+            animation: enhanced-spin 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 4px 8px rgba(81, 207, 102, 0.3));
+        }
+        
+        @keyframes enhanced-spin {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state-icon {
+            font-size: 5rem;
+            background: linear-gradient(135deg, var(--text-muted), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 4px 8px rgba(81, 207, 102, 0.2));
+        }
+        
+        .search-layout {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 3rem;
+            align-items: start;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--border-primary);
+            color: var(--text-secondary);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            transition: var(--transition-smooth);
+        }
+        
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, var(--accent-green), #40c057);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+            transform: translateY(-1px);
+        }
+        
+        .btn-group .btn-check:checked + .btn {
+            background: linear-gradient(135deg, var(--accent-green), #40c057);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+            box-shadow: 0 4px 12px rgba(81, 207, 102, 0.3);
+        }
+        
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .floating-dot {
+            position: absolute;
+            background: var(--accent-green);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float-search 12s ease-in-out infinite;
+        }
+        
+        .floating-dot:nth-child(1) {
+            width: 10px;
+            height: 10px;
+            top: 15%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-dot:nth-child(2) {
+            width: 14px;
+            height: 14px;
+            top: 70%;
+            right: 15%;
+            animation-delay: 4s;
+        }
+        
+        .floating-dot:nth-child(3) {
+            width: 8px;
+            height: 8px;
+            bottom: 25%;
+            left: 80%;
+            animation-delay: 8s;
+        }
+        
+        .floating-dot:nth-child(4) {
+            width: 12px;
+            height: 12px;
+            top: 40%;
+            right: 70%;
+            animation-delay: 6s;
+        }
+        
+        @keyframes float-search {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 0.3; }
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.2));
+            border: 1px solid var(--accent-yellow);
+            color: var(--accent-yellow);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(255, 193, 7, 0.2);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border-primary);
+            color: var(--text-primary);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .search-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .search-container {
+                position: static;
+                top: auto;
+            }
+            
+            .search-header {
+                padding: 3rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper search-page">
+        <div class="floating-elements">
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+        </div>
+        
+        <!-- STANDARDIZED NAVIGATION -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="/" class="navbar-brand">
+                    <i class="fas fa-brain icon"></i> HireAI
+                </a>
+                <ul class="navbar-nav">
+                    <li><a href="/" class="nav-link" data-page="home">Home</a></li>
+                    <li><a href="/upload" class="nav-link" data-page="upload">Upload Resume</a></li>
+                    <li><a href="/candidates" class="nav-link" data-page="candidates">View Candidates</a></li>
+                    <li><a href="/search" class="nav-link" data-page="search">Search Candidates</a></li>
+                    <li><a href="/outreach" class="nav-link" data-page="outreach">Personalized Outreach</a></li>
+                    <li><a href="/analytics" class="nav-link" data-page="analytics">Analytics</a></li>
+                                                         <li><a href="/background_check" class="nav-link" data-page="Background Check">Ai Screening</a></li>
+
+                </ul>
+                
+                <!-- Mobile menu toggle -->
+                <button class="navbar-toggle" id="navbar-toggle" style="display: none;">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Enhanced Search Header -->
+        <div class="search-header">
+            <div class="main-container">
+                <div class="centered-content">
+                    <h1 class="hero-title mb-3">
+                        <i class="fas fa-search icon-large"></i> Search Candidates
+                    </h1>
+                    <p class="hero-subtitle mb-4">Find the perfect candidates using AI-powered matching</p>
+                    
+                    <!-- Enhanced Live timestamp -->
+                    <div class="datetime-display">
+                        <i class="fas fa-clock icon"></i>
+                        <span id="currentDateTime">2025-06-01 17:16:51</span> UTC
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-container">
+            <div class="search-layout">
+                <!-- Enhanced Search Form -->
+                <div class="animate-fadeInLeft">
+                    <div class="search-container">
+                        <h3 class="mb-4">
+                            <i class="fas fa-sliders-h icon"></i> Search Criteria
+                        </h3>
+                        
+                        <form id="search-form">
+                            <!-- Job Description -->
+                            <div class="form-group">
+                                <label class="form-label">Job Description *</label>
+                                <textarea id="job-description" class="form-input form-textarea" rows="6" 
+                                    placeholder="Paste the job description here...&#10;&#10;Example:&#10;We are looking for a Senior Python Developer with 5+ years of experience in Django, React, and AWS. The candidate should have strong problem-solving skills and experience with microservices architecture."></textarea>
+                            </div>
+
+                            <!-- Enhanced Analysis Button -->
+                            <div class="form-group">
+                                <button type="button" class="btn enhanced-btn" id="analyze-job-btn" style="width: 100%;">
+                                    <i class="fas fa-magic icon"></i> Analyze Job Description
+                                </button>
+                            </div>
+
+                            <!-- Filters -->
+                            <h4 class="mb-3">Filters</h4>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Minimum Experience (years)</label>
+                                <select id="min-experience" class="form-input">
+                                    <option value="">Any</option>
+                                    <option value="0">Entry Level (0-1)</option>
+                                    <option value="2">2+ years</option>
+                                    <option value="3">3+ years</option>
+                                    <option value="5">5+ years</option>
+                                    <option value="7">7+ years</option>
+                                    <option value="10">10+ years</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Required Skills</label>
+                                <input type="text" id="required-skills" class="form-input" 
+                                    placeholder="e.g. Python, React, AWS (comma separated)">
+                                <small class="text-muted">Candidates must have at least one of these skills</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Location</label>
+                                <input type="text" id="location-filter" class="form-input" 
+                                    placeholder="e.g. San Francisco, Remote">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-large enhanced-btn" style="width: 100%;">
+                                <i class="fas fa-search icon"></i> Search Candidates
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Enhanced Job Analysis Results -->
+                    <div id="job-analysis-card" class="mt-4" style="display: none;">
+                        <div class="job-analysis">
+                            <h4 class="mb-3">
+                                <i class="fas fa-lightbulb icon"></i> Job Analysis
+                            </h4>
+                            <div id="job-analysis-content">
+                                <!-- Analysis will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Results -->
+                <div class="animate-fadeInUp">
+                    <!-- Enhanced Loading State -->
+                    <div id="loading-state" class="centered-content" style="display: none; min-height: 400px;">
+                        <div class="loading-spinner"></div>
+                        <p class="mt-4 text-secondary" style="font-size: 1.1rem;">Searching candidates...</p>
+                    </div>
+
+                    <!-- Enhanced No Results State -->
+                    <div id="no-results" class="centered-content" style="display: none; min-height: 400px;">
+                        <i class="fas fa-search empty-state-icon"></i>
+                        <h3 class="text-secondary mb-3">No candidates found</h3>
+                        <p class="text-secondary mb-4">Try adjusting your search criteria or upload more resumes.</p>
+                        <a href="/upload" class="btn btn-primary enhanced-btn">
+                            <i class="fas fa-upload icon"></i> Upload Resumes
+                        </a>
+                    </div>
+
+                    <!-- Enhanced Empty State -->
+                    <div id="empty-state" class="centered-content" style="min-height: 500px;">
+                        <i class="fas fa-users empty-state-icon"></i>
+                        <h3 class="text-secondary mb-3">Ready to Search</h3>
+                        <p class="text-secondary">Enter a job description to find matching candidates from your database.</p>
+                    </div>
+
+                    <!-- Enhanced Results Header -->
+                    <div id="results-header" style="display: none;">
+                        <div class="results-header">
+                            <div class="flex-between mb-3">
+                                <h3 class="mb-0">
+                                    <span id="results-count">0</span> Candidates Found
+                                </h3>
+                                <div class="flex-center" style="gap: 0.75rem;">
+                                    <div class="btn-group" role="group">
+                                        <input type="radio" class="btn-check" name="sort-options" id="sort-score" checked>
+                                        <label class="btn btn-outline-primary btn-small" for="sort-score">
+                                            <i class="fas fa-star icon"></i> Best Match
+                                        </label>
+                                        
+                                        <input type="radio" class="btn-check" name="sort-options" id="sort-experience">
+                                        <label class="btn btn-outline-primary btn-small" for="sort-experience">
+                                            <i class="fas fa-calendar icon"></i> Experience
+                                        </label>
+                                    </div>
+
+                                    <button type="button" class="btn btn-success btn-small enhanced-btn" onclick="exportResults()">
+                                        <i class="fas fa-download icon"></i> Export
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results List -->
+                    <div id="results-list">
+                        <!-- Candidate cards will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <i class="fas fa-brain icon"></i> HireAI
+                </div>
+                <p class="footer-text">
+                    Built with ❤️ by <strong>Team Seeds! 🌱</strong><br>
+                    Intelligent candidate matching powered by AI
+                </p>
+                <div class="footer-timestamp">
+                    <i class="fas fa-clock icon-only"></i>
+                    <span id="footerDateTime">2025-06-01 17:16:51</span> UTC
+                    <span class="text-muted" style="margin-left: 1rem;">
+                        <i class="fas fa-seedling icon-only"></i> Team Seeds
+                    </span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Enhanced Candidate Detail Modal -->
+    <div class="modal fade" id="candidateModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modal-candidate-name">Candidate Details</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modal-candidate-details">
+                        <!-- Detailed candidate info will be populated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary enhanced-btn">
+                        <i class="fas fa-envelope icon"></i> Contact Candidate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS for modal functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- STANDARDIZED NAVBAR ACTIVE STATE MANAGEMENT + ALL PRESERVED FUNCTIONALITY -->
+    <script>
+        let currentCandidates = [];
+        let searchResults = []; // for export compatibility
+        let currentJobDescription = '';
+
+        const searchForm = document.getElementById('search-form');
+        const jobDescriptionInput = document.getElementById('job-description');
+        const analyzeJobBtn = document.getElementById('analyze-job-btn');
+        const loadingState = document.getElementById('loading-state');
+        const emptyState = document.getElementById('empty-state');
+        const noResults = document.getElementById('no-results');
+        const resultsHeader = document.getElementById('results-header');
+        const resultsList = document.getElementById('results-list');
+        const resultsCount = document.getElementById('results-count');
+
+        // STANDARDIZED NAVBAR ACTIVE STATE MANAGEMENT
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // Remove active class from all links
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            // Add active class to current page link
+            let activeSet = false;
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                const page = link.getAttribute('data-page');
+                
+                // Check for exact match or page identifier
+                if (href === currentPath || 
+                    (currentPath === '/' && page === 'home') ||
+                    (currentPath.includes('/upload') && page === 'upload') ||
+                    (currentPath.includes('/candidates') && page === 'candidates') ||
+                    (currentPath.includes('/search') && page === 'search') ||
+                    (currentPath.includes('/outreach') && page === 'outreach') ||
+                    (currentPath.includes('/analytics') && page === 'analytics')) {
+                    link.classList.add('active');
+                    activeSet = true;
+                }
+            });
+            
+            // Fallback: if no active state set, activate home
+            if (!activeSet) {
+                const homeLink = document.querySelector('[data-page="home"]');
+                if (homeLink) homeLink.classList.add('active');
+            }
+            
+            // Mobile menu toggle functionality
+            const navbarToggle = document.getElementById('navbar-toggle');
+            const navbarNav = document.querySelector('.navbar-nav');
+            
+            if (navbarToggle && navbarNav) {
+                navbarToggle.addEventListener('click', function() {
+                    navbarNav.classList.toggle('active');
+                });
+                
+                // Close mobile menu when clicking on a link
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        navbarNav.classList.remove('active');
+                    });
+                });
+                
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!navbarToggle.contains(e.target) && !navbarNav.contains(e.target)) {
+                        navbarNav.classList.remove('active');
+                    }
+                });
+            }
+        });
+
+        // Update live datetime to UTC (UPDATED)
+        function updateDateTime() {
+            const now = new Date();
+            const utcString = now.toISOString().slice(0, 19).replace('T', ' ');
+            const currentElement = document.getElementById('currentDateTime');
+            const footerElement = document.getElementById('footerDateTime');
+            
+            if (currentElement) currentElement.textContent = utcString;
+            if (footerElement) footerElement.textContent = utcString;
+        }
+
+        // Search form submission (PRESERVED)
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await searchCandidates();
+        });
+
+        // Job analysis (PRESERVED)
+        analyzeJobBtn.addEventListener('click', async () => {
+            const jobDescription = jobDescriptionInput.value.trim();
+            if (!jobDescription) {
+                alert('Please enter a job description first.');
+                return;
+            }
+            await analyzeJobDescription(jobDescription);
+        });
+
+        // Sort options (PRESERVED)
+        document.getElementById('sort-score').addEventListener('change', () => {
+            if (currentCandidates.length > 0) {
+                sortAndDisplayCandidates('score');
+            }
+        });
+
+        document.getElementById('sort-experience').addEventListener('change', () => {
+            if (currentCandidates.length > 0) {
+                sortAndDisplayCandidates('experience');
+            }
+        });
+
+        async function searchCandidates() {
+            const jobDescription = jobDescriptionInput.value.trim();
+            const minExperience = document.getElementById('min-experience').value;
+            const requiredSkills = document.getElementById('required-skills').value;
+            const location = document.getElementById('location-filter').value;
+
+            if (!jobDescription) {
+                alert('Please enter a job description.');
+                return;
+            }
+
+            currentJobDescription = jobDescription;
+            showLoading();
+
+            try {
+                const response = await fetch('/api/search_candidates', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        job_description: jobDescription,
+                        filters: {
+                            min_experience: minExperience,
+                            required_skills: requiredSkills ? requiredSkills.split(',').map(s => s.trim()) : [],
+                            location: location
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentCandidates = data.candidates;
+                    searchResults = data.candidates; // Sync both variables
+                    displayResults(data.candidates);
+                    
+                    if (!data.ai_enabled) {
+                        showWarning('AI features are limited. Using basic matching.');
+                    }
+                } else {
+                    throw new Error(data.error || 'Search failed');
+                }
+
+            } catch (error) {
+                hideLoading();
+                alert('Search failed: ' + error.message);
+            }
+        }
+
+        async function analyzeJobDescription(jobDescription) {
+            analyzeJobBtn.disabled = true;
+            analyzeJobBtn.innerHTML = '<span class="loading-spinner" style="width: 1rem; height: 1rem; border-width: 2px;"></span> Analyzing...';
+
+            try {
+                const response = await fetch('/api/analyze_job', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        job_description: jobDescription
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayJobAnalysis(data.analysis);
+                } else {
+                    throw new Error(data.error || 'Analysis failed');
+                }
+
+            } catch (error) {
+                alert('Job analysis failed: ' + error.message);
+            } finally {
+                analyzeJobBtn.disabled = false;
+                analyzeJobBtn.innerHTML = '<i class="fas fa-magic icon"></i> Analyze Job Description';
+            }
+        }
+
+        function displayJobAnalysis(analysis) {
+            const analysisCard = document.getElementById('job-analysis-card');
+            const analysisContent = document.getElementById('job-analysis-content');
+
+            let html = '';
+
+            if (analysis.requirements) {
+                html += '<div class="mb-3">';
+                html += '<strong>Required Skills:</strong><br>';
+                if (analysis.requirements.required_skills && analysis.requirements.required_skills.length > 0) {
+                    analysis.requirements.required_skills.forEach(skill => {
+                        html += `<span class="skill-tag">${skill}</span>`;
+                    });
+                } else {
+                    html += '<span class="text-muted">No specific skills identified</span>';
+                }
+                html += '</div>';
+
+                if (analysis.requirements.min_experience_years > 0) {
+                    html += `<div class="mb-3"><strong>Min Experience:</strong> ${analysis.requirements.min_experience_years} years</div>`;
+                }
+            }
+
+            if (analysis.analysis) {
+                if (analysis.analysis.job_level) {
+                    html += `<div class="mb-2"><strong>Job Level:</strong> ${analysis.analysis.job_level}</div>`;
+                }
+                if (analysis.analysis.job_type) {
+                    html += `<div class="mb-2"><strong>Job Type:</strong> ${analysis.analysis.job_type}</div>`;
+                }
+            }
+
+            analysisContent.innerHTML = html;
+            analysisCard.style.display = 'block';
+        }
+
+        function showLoading() {
+            emptyState.style.display = 'none';
+            noResults.style.display = 'none';
+            resultsHeader.style.display = 'none';
+            loadingState.style.display = 'flex';
+        }
+
+        function hideLoading() {
+            loadingState.style.display = 'none';
+        }
+
+        function displayResults(candidates) {
+            hideLoading();
+
+            if (candidates.length === 0) {
+                emptyState.style.display = 'none';
+                noResults.style.display = 'flex';
+                resultsHeader.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            noResults.style.display = 'none';
+            resultsHeader.style.display = 'block';
+
+            resultsCount.textContent = candidates.length;
+            sortAndDisplayCandidates('score');
+        }
+
+        function sortAndDisplayCandidates(sortBy) {
+            let sortedCandidates = [...currentCandidates];
+
+            if (sortBy === 'score') {
+                sortedCandidates.sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
+            } else if (sortBy === 'experience') {
+                sortedCandidates.sort((a, b) => (b.experience_years || 0) - (a.experience_years || 0));
+            }
+
+            let html = '';
+            sortedCandidates.forEach(candidate => {
+                html += createCandidateCard(candidate);
+            });
+
+            resultsList.innerHTML = html;
+        }
+
+        function createCandidateCard(candidate) {
+            const matchScore = candidate.match_score || 0;
+            const scoreClass = matchScore >= 80 ? 'score-excellent' : matchScore >= 60 ? 'score-good' : 'score-fair';
+            
+            let skillsHtml = '';
+            if (candidate.skills && candidate.skills.length > 0) {
+                candidate.skills.slice(0, 5).forEach(skill => {
+                    skillsHtml += `<span class="skill-tag">${skill}</span>`;
+                });
+                if (candidate.skills.length > 5) {
+                    skillsHtml += `<span class="skill-tag">+${candidate.skills.length - 5} more</span>`;
+                }
+            }
+
+            let reasonsHtml = '';
+            if (candidate.match_reasons && candidate.match_reasons.length > 0) {
+                reasonsHtml = candidate.match_reasons.slice(0, 2).map(reason => 
+                    `<li class="text-muted" style="font-size: 0.875rem;">${reason}</li>`
+                ).join('');
+            }
+
+            return `
+                <div class="card candidate-card mb-3" onclick="showCandidateDetails('${candidate.id}')">
+                    <div class="card-body">
+                        <div class="flex-between">
+                            <div class="flex-start" style="flex: 1;">
+                                <div style="flex: 1;">
+                                    <h4 class="mb-2">
+                                        ${candidate.name || 'Unknown Name'}
+                                        <small class="text-muted">(${candidate.experience_years || 0} years exp.)</small>
+                                    </h4>
+                                    <p class="text-secondary mb-2">
+                                        <i class="fas fa-envelope icon"></i> ${candidate.email || 'No email'}
+                                        <i class="fas fa-map-marker-alt icon"></i> ${candidate.location || 'No location'}
+                                    </p>
+                                    <div class="mb-2">${skillsHtml}</div>
+                                    ${reasonsHtml ? `<ul class="mb-0">${reasonsHtml}</ul>` : ''}
+                                </div>
+                            </div>
+                            <div class="text-center" style="min-width: 120px;">
+                                <div class="match-score ${scoreClass} mb-1">${matchScore}%</div>
+                                <small class="text-muted d-block">Match Score</small>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        Skills: ${candidate.skill_match || 0}%<br>
+                                        Experience: ${candidate.experience_match || 0}%
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showCandidateDetails(candidateId) {
+            const candidate = currentCandidates.find(c => c.id === candidateId);
+            if (!candidate) return;
+
+            document.getElementById('modal-candidate-name').textContent = candidate.name || 'Unknown Name';
+            
+            let detailsHtml = `
+                <div class="grid grid-2">
+                    <div>
+                        <h4 class="mb-3">Contact Information</h4>
+                        <p><strong>Email:</strong> ${candidate.email || 'Not provided'}</p>
+                        <p><strong>Phone:</strong> ${candidate.phone || 'Not provided'}</p>
+                        <p><strong>Location:</strong> ${candidate.location || 'Not provided'}</p>
+                        <p><strong>Experience:</strong> ${candidate.experience_years || 0} years</p>
+                    </div>
+                    <div>
+                        <h4 class="mb-3">Match Analysis</h4>
+                        <p><strong>Overall Match:</strong> ${candidate.match_score || 0}%</p>
+                        <p><strong>Skill Match:</strong> ${candidate.skill_match || 0}%</p>
+                        <p><strong>Experience Match:</strong> ${candidate.experience_match || 0}%</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h4 class="mb-3">Skills</h4>
+                    <div class="mb-3">
+            `;
+
+            if (candidate.skills && candidate.skills.length > 0) {
+                candidate.skills.forEach(skill => {
+                    detailsHtml += `<span class="skill-tag">${skill}</span>`;
+                });
+            } else {
+                detailsHtml += '<span class="text-muted">No skills listed</span>';
+            }
+
+            detailsHtml += `
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h4 class="mb-3">Why This Candidate Matches</h4>
+                    <ul>
+            `;
+
+            if (candidate.match_reasons && candidate.match_reasons.length > 0) {
+                candidate.match_reasons.forEach(reason => {
+                    detailsHtml += `<li>${reason}</li>`;
+                });
+            } else {
+                detailsHtml += '<li>No specific match reasons available</li>';
+            }
+
+            detailsHtml += `
+                    </ul>
+                </div>
+
+                <div class="mt-4">
+                    <h4 class="mb-3">Professional Summary</h4>
+                    <p class="text-secondary">${candidate.summary || 'No summary available'}</p>
+                </div>
+            `;
+
+            document.getElementById('modal-candidate-details').innerHTML = detailsHtml;
+            
+            const modal = new bootstrap.Modal(document.getElementById('candidateModal'));
+            modal.show();
+        }
+
+        function showWarning(message) {
+            // Create a temporary warning alert
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'alert alert-warning';
+            warningDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle icon"></i> ${message}
+                <button type="button" class="btn btn-small" onclick="this.parentElement.remove()" style="float: right;">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            document.querySelector('.main-container').insertBefore(warningDiv, document.querySelector('.search-layout'));
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                if (warningDiv.parentElement) {
+                    warningDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Export Functions (PRESERVED)
+        function exportResults() {
+            if (!searchResults || searchResults.length === 0) {
+                alert('No results to export. Please perform a search first.');
+                return;
+            }
+            
+            // Show export options
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div class="modal fade" id="exportModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="modal-title">Export Search Results</h3>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Export ${searchResults.length} candidates in your preferred format:</p>
+                                <div class="grid grid-2" style="gap: 1rem;">
+                                    <button class="btn btn-primary enhanced-btn" onclick="downloadExport('csv')">
+                                        <i class="fas fa-file-csv icon"></i> Download as CSV
+                                    </button>
+                                    <button class="btn enhanced-btn" onclick="downloadExport('json')">
+                                        <i class="fas fa-file-code icon"></i> Download as JSON
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            new bootstrap.Modal(document.getElementById('exportModal')).show();
+        }
+
+        async function downloadExport(format) {
+            try {
+                const response = await fetch('/api/export_candidates', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        candidates: searchResults,
+                        format: format
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `candidates_export.${format}`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('exportModal')).hide();
+                } else {
+                    alert('Export failed');
+                }
+            } catch (error) {
+                alert('Export error: ' + error.message);
+            }
+        }
+
+        // Scroll animations (PRESERVED)
+        function addScrollAnimations() {
+            const animateElements = document.querySelectorAll('.animate-fadeInUp, .animate-fadeInLeft');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0) translateX(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            animateElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transition = 'all 0.6s ease-out';
+                if (el.classList.contains('animate-fadeInUp')) {
+                    el.style.transform = 'translateY(30px)';
+                } else if (el.classList.contains('animate-fadeInLeft')) {
+                    el.style.transform = 'translateX(-30px)';
+                }
+                observer.observe(el);
+            });
+        }
+
+        // Initialize (PRESERVED)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current time with provided timestamp
+            document.getElementById('currentDateTime').textContent = '2025-06-01 17:16:51';
+            document.getElementById('footerDateTime').textContent = '2025-06-01 17:16:51';
+            
+            // Start live updates
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            addScrollAnimations();
+            
+            console.log('HireAI Search Page initialized for user: pranamya-jain');
+            console.log('Current time: 2025-06-01 17:16:51 UTC');
+        });
+    </script>
+</body>
+</html>

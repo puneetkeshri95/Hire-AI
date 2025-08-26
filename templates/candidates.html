@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HireAI - Intelligent candidate management powered by AI">
+    <title>Candidates - HireAI</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+    <style>
+        /* Enhanced aesthetic styles for candidates.html */
+        .candidates-page {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }    
+        
+        .candidates-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(81, 207, 102, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(81, 207, 102, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .candidates-header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 50%, var(--bg-card) 100%);
+            padding: 2rem 0; /* Reduced from 4rem to 2rem */
+            border-bottom: 1px solid var(--border-primary);
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .candidates-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 100%, rgba(81, 207, 102, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .hero-title {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-green) 50%, var(--text-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .candidates-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .candidate-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .candidate-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(81, 207, 102, 0.1), transparent);
+            transition: var(--transition-smooth);
+        }
+        
+        .candidate-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-green), #40c057, var(--accent-green));
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+        
+        .candidate-card:hover::before {
+            left: 100%;
+        }
+        
+        .candidate-card:hover::after {
+            opacity: 1;
+        }
+        
+        .candidate-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 48px rgba(81, 207, 102, 0.2);
+            border-color: var(--accent-green);
+        }
+        
+        .candidate-avatar {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent-green), #40c057);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: var(--bg-primary);
+            font-weight: 600;
+            margin-right: 1.5rem;
+            box-shadow: 0 4px 16px rgba(81, 207, 102, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .candidate-avatar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: var(--transition-smooth);
+        }
+        
+        .candidate-avatar:hover::before {
+            left: 100%;
+        }
+        
+        .skill-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
+            padding: 0.4rem 0.8rem;
+            margin: 0.25rem 0.25rem 0.25rem 0;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skill-tag::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(81, 207, 102, 0.2), transparent);
+            transition: var(--transition-smooth);
+        }
+        
+        .skill-tag:hover::before {
+            left: 100%;
+        }
+        
+        .skill-tag:hover {
+            background: linear-gradient(135deg, var(--accent-green), #40c057);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+            transform: translateY(-1px);
+        }
+        
+        .search-filter-section {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 2rem; /* Reduced from 2.5rem to 2rem */
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-filter-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+        
+        .search-filter-section:hover::before {
+            opacity: 1;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem; /* Reduced from 2rem to 1.5rem */
+            margin-bottom: 2rem; /* Reduced from 3rem to 2rem */
+            position: relative;
+            z-index: 2;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 2rem 1.5rem; /* Reduced from 2.5rem 2rem to 2rem 1.5rem */
+            text-align: center;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(81, 207, 102, 0.1), transparent);
+            transition: var(--transition-smooth);
+        }
+        
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-green), #40c057, var(--accent-green));
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-card:hover::after {
+            opacity: 1;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 48px rgba(81, 207, 102, 0.2);
+            border-color: var(--accent-green);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-green), #40c057);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            text-shadow: 0 4px 8px rgba(81, 207, 102, 0.3);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .empty-state-icon {
+            font-size: 5rem;
+            background: linear-gradient(135deg, var(--text-muted), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 4px 8px rgba(81, 207, 102, 0.2));
+        }
+        
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .filter-tag {
+            background: linear-gradient(135deg, rgba(81, 207, 102, 0.2), rgba(81, 207, 102, 0.3));
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(81, 207, 102, 0.2);
+        }
+        
+        .filter-tag .remove-filter {
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: var(--transition-fast);
+        }
+        
+        .filter-tag .remove-filter:hover {
+            transform: scale(1.2);
+        }
+        
+        .candidate-meta {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+        
+        .pagination .btn {
+            min-width: 40px;
+        }
+        
+        .pagination .btn.active {
+            background: linear-gradient(135deg, var(--accent-green), #40c057);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+            box-shadow: 0 4px 12px rgba(81, 207, 102, 0.3);
+        }
+        
+        .enhanced-btn {
+            background: linear-gradient(135deg, var(--accent-green) 0%, #40c057 100%);
+            box-shadow: 0 4px 15px rgba(81, 207, 102, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--transition-smooth);
+        }
+        
+        .enhanced-btn:hover::before {
+            left: 100%;
+        }
+        
+        .enhanced-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(81, 207, 102, 0.4);
+        }
+        
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .floating-dot {
+            position: absolute;
+            background: var(--accent-green);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float-candidates 14s ease-in-out infinite;
+        }
+        
+        .floating-dot:nth-child(1) {
+            width: 12px;
+            height: 12px;
+            top: 25%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+        
+        .floating-dot:nth-child(2) {
+            width: 16px;
+            height: 16px;
+            top: 65%;
+            right: 25%;
+            animation-delay: 5s;
+        }
+        
+        .floating-dot:nth-child(3) {
+            width: 10px;
+            height: 10px;
+            bottom: 35%;
+            left: 70%;
+            animation-delay: 10s;
+        }
+        
+        .floating-dot:nth-child(4) {
+            width: 8px;
+            height: 8px;
+            top: 45%;
+            left: 85%;
+            animation-delay: 7s;
+        }
+        
+        @keyframes float-candidates {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+            50% { transform: translateY(-40px) rotate(180deg); opacity: 0.3; }
+        }
+        
+        /* Fixed navbar for mobile - Add this */
+        @media (max-width: 768px) {
+            .navbar-toggle {
+                display: block !important; /* Override inline style */
+                position: absolute;
+                right: 1rem;
+                top: 1rem;
+                background: transparent;
+                border: none;
+                color: var(--text-primary);
+                font-size: 1.5rem;
+                cursor: pointer;
+                z-index: 100;
+            }
+            
+            .navbar-nav {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--bg-primary);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 99;
+            }
+            
+            .navbar-nav.active {
+                display: flex;
+            }
+            
+            .navbar-nav .nav-link {
+                font-size: 1.25rem;
+                margin: 0.5rem 0;
+            }
+            
+            .candidates-header {
+                padding: 2rem 0;
+            }
+            
+            .candidate-card {
+                padding: 1.5rem;
+            }
+            
+            .candidate-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .search-filter-section {
+                padding: 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+            
+            /* Make the grid responsive */
+            .grid-3 {
+                grid-template-columns: 1fr !important;
+                gap: 0.75rem !important;
+            }
+            
+            /* Improve filter button layout */
+            .flex-between {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+        
+        /* Fix animation-related issues */
+        .animate-fadeInUp {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper candidates-page">
+        <div class="floating-elements">
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+        </div>
+        
+        <!-- STANDARDIZED NAVIGATION -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="/" class="navbar-brand">
+                    <i class="fas fa-brain icon"></i> HireAI
+                </a>
+                <ul class="navbar-nav">
+                    <li><a href="/" class="nav-link" data-page="home">Home</a></li>
+                    <li><a href="/upload" class="nav-link" data-page="upload">Upload Resume</a></li>
+                    <li><a href="/candidates" class="nav-link" data-page="candidates">View Candidates</a></li>
+                    <li><a href="/search" class="nav-link" data-page="search">Search Candidates</a></li>
+                    <li><a href="/outreach" class="nav-link" data-page="outreach">Personalized Outreach</a></li>
+                    <li><a href="/analytics" class="nav-link" data-page="analytics">Analytics</a></li>
+                    <li><a href="/background_check" class="nav-link" data-page="Background Check">AI Screening</a></li>
+                </ul>
+                
+                <!-- Mobile menu toggle - removed display:none inline style -->
+                <button class="navbar-toggle" id="navbar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Enhanced Candidates Header -->
+        <div class="candidates-header">
+            <div class="main-container">
+                <div class="centered-content">
+                    <h1 class="hero-title mb-3">
+                        <i class="fas fa-users icon-large"></i>
+                        Candidate Database
+                    </h1>
+                    <p class="hero-subtitle mb-4">
+                        Manage and explore your candidate pool with advanced filtering and search
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="candidates-container">
+                <!-- Enhanced Statistics Section -->
+                <div class="animate-fadeInUp">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-number" id="total-candidates">{{ (candidates|length) if candidates else 0 }}</span>
+                            <div class="stat-label">
+                                <i class="fas fa-users icon"></i> Total Candidates
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="new-this-week">0</span>
+                            <div class="stat-label">
+                                <i class="fas fa-calendar-week icon"></i> Added This Week
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="avg-experience">0</span>
+                            <div class="stat-label">
+                                <i class="fas fa-chart-line icon"></i> Avg. Experience (Years)
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="top-skills">0</span>
+                            <div class="stat-label">
+                                <i class="fas fa-star icon"></i> Unique Skills
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Search and Filter Section -->
+                <div class="animate-fadeInUp">
+                    <div class="search-filter-section">
+                        <h3 class="mb-4">
+                            <i class="fas fa-filter icon"></i> Search & Filter
+                        </h3>
+                        
+                        <div class="grid grid-3" style="gap: 1rem; margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Search by name or email</label>
+                                <input type="text" id="search-input" class="form-input" placeholder="Type to search...">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Filter by skills</label>
+                                <input type="text" id="skills-filter" class="form-input" placeholder="e.g. Python, React">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Experience range</label>
+                                <select id="experience-filter" class="form-input">
+                                    <option value="">Any experience</option>
+                                    <option value="0-2">0-2 years</option>
+                                    <option value="3-5">3-5 years</option>
+                                    <option value="6-10">6-10 years</option>
+                                    <option value="10+">10+ years</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-between">
+                            <div class="flex-start" style="gap: 0.5rem;">
+                                <button class="btn btn-primary enhanced-btn" onclick="applyFilters()">
+                                    <i class="fas fa-search icon"></i> Apply Filters
+                                </button>
+                                <button class="btn enhanced-btn" onclick="clearFilters()">
+                                    <i class="fas fa-times icon"></i> Clear
+                                </button>
+                            </div>
+                            
+                            <div class="flex-start" style="gap: 0.5rem;">
+                                <select id="sort-select" class="form-input" onchange="sortCandidates()">
+                                    <option value="name">Sort by Name</option>
+                                    <option value="experience">Sort by Experience</option>
+                                    <option value="date">Sort by Date Added</option>
+                                </select>
+                                <button class="btn btn-success enhanced-btn" onclick="exportCandidates()">
+                                    <i class="fas fa-download icon"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Active Filters -->
+                        <div class="filter-tags" id="active-filters" style="display: none;">
+                            <!-- Active filter tags will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Results Section -->
+                <div class="animate-fadeInUp">
+                    {% if candidates and candidates|length > 0 %}
+                        <!-- Candidates List -->
+                        <div id="candidates-list">
+                            {% for candidate in candidates %}
+                                <div class="candidate-card" data-candidate-id="{{ candidate.id if candidate.id else 'unknown' }}">
+                                    <div class="flex-start">
+                                        <div class="candidate-avatar">
+                                            {{ (candidate.name|string|first|upper) if candidate.name else 'U' }}
+                                        </div>
+                                        
+                                        <div style="flex: 1;">
+                                            <div class="flex-between mb-2">
+                                                <h4 class="mb-1">{{ candidate.name if candidate.name else 'Unknown Name' }}</h4>
+                                                <span class="candidate-meta">
+                                                    <i class="fas fa-calendar icon"></i>
+                                                    {{ candidate.experience_years if candidate.experience_years else 0 }} years exp.
+                                                </span>
+                                            </div>
+                                            
+                                            <div class="candidate-meta mb-2">
+                                                {% if candidate.email %}
+                                                    <i class="fas fa-envelope icon"></i> {{ candidate.email }}
+                                                {% endif %}
+                                                {% if candidate.location %}
+                                                    <i class="fas fa-map-marker-alt icon"></i> {{ candidate.location }}
+                                                {% endif %}
+                                                {% if candidate.phone %}
+                                                    <i class="fas fa-phone icon"></i> {{ candidate.phone }}
+                                                {% endif %}
+                                            </div>
+                                            
+                                            {% if candidate.skills and candidate.skills|length > 0 %}
+                                                <div class="skills-section">
+                                                    {% for skill in candidate.skills[:5] %}
+                                                        <span class="skill-tag">{{ skill }}</span>
+                                                    {% endfor %}
+                                                    {% if candidate.skills|length > 5 %}
+                                                        <span class="skill-tag">+{{ candidate.skills|length - 5 }} more</span>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                            
+                                            {% if candidate.summary %}
+                                                <p class="text-secondary mt-2" style="font-size: 0.875rem; line-height: 1.4;">
+                                                    {{ candidate.summary[:150] }}{% if candidate.summary|length > 150 %}...{% endif %}
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination" id="pagination">
+                            <!-- Pagination will be populated by JavaScript if needed -->
+                        </div>
+                        
+                    {% else %}
+                        <!-- Enhanced Empty State -->
+                        <div class="empty-state">
+                            <i class="fas fa-users empty-state-icon"></i>
+                            <h3 class="text-secondary mb-3">No Candidates Found</h3>
+                            <p class="text-secondary mb-4">
+                                Start building your candidate database by uploading resumes.
+                            </p>
+                            <a href="/upload" class="btn btn-primary btn-large enhanced-btn">
+                                <i class="fas fa-upload icon"></i> Upload Resumes
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Enhanced Quick Actions -->
+                {% if candidates and candidates|length > 0 %}
+                    <div class="centered-content mt-5 animate-fadeInUp">
+                        <h3 class="mb-4">Quick Actions</h3>
+                        <div class="flex-center" style="gap: 1rem; flex-wrap: wrap;">
+                            <a href="/upload" class="btn btn-large enhanced-btn">
+                                <i class="fas fa-plus icon"></i> Add More Candidates
+                            </a>
+                            <a href="/search" class="btn btn-primary btn-large enhanced-btn">
+                                <i class="fas fa-search icon"></i> Start Searching
+                            </a>
+                            <a href="/analytics" class="btn btn-large enhanced-btn">
+                                <i class="fas fa-chart-bar icon"></i> View Analytics
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <i class="fas fa-brain icon"></i> HireAI
+                </div>
+                <p class="footer-text">
+                    Built with ❤️ by <strong>Team Seeds! 🌱</strong><br>
+                    Intelligent candidate management powered by AI
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // STANDARDIZED NAVBAR ACTIVE STATE MANAGEMENT
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // Remove active class from all links
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            // Add active class to current page link
+            let activeSet = false;
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                const page = link.getAttribute('data-page');
+                
+                // Check for exact match or page identifier
+                if (href === currentPath || 
+                    (currentPath === '/' && page === 'home') ||
+                    (currentPath.includes('/upload') && page === 'upload') ||
+                    (currentPath.includes('/candidates') && page === 'candidates') ||
+                    (currentPath.includes('/search') && page === 'search') ||
+                    (currentPath.includes('/outreach') && page === 'outreach') ||
+                    (currentPath.includes('/analytics') && page === 'analytics')) {
+                    link.classList.add('active');
+                    activeSet = true;
+                }
+            });
+            
+            // Fallback: if no active state set, activate home
+            if (!activeSet) {
+                const homeLink = document.querySelector('[data-page="home"]');
+                if (homeLink) homeLink.classList.add('active');
+            }
+            
+            // Mobile menu toggle functionality - fixed to show mobile menu button
+            const navbarToggle = document.getElementById('navbar-toggle');
+            const navbarNav = document.querySelector('.navbar-nav');
+            
+            if (navbarToggle && navbarNav) {
+                navbarToggle.addEventListener('click', function() {
+                    navbarNav.classList.toggle('active');
+                });
+                
+                // Close mobile menu when clicking on a link
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        navbarNav.classList.remove('active');
+                    });
+                });
+                
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!navbarToggle.contains(e.target) && !navbarNav.contains(e.target)) {
+                        navbarNav.classList.remove('active');
+                    }
+                });
+            }
+        });
+
+        // Safe initialization of candidates data with null checking
+        let allCandidates = [];
+        let filteredCandidates = [];
+        let currentFilters = {};
+        
+        // Safely parse candidates data from server
+        try {
+            const candidatesData = {{ candidates|tojson|safe }};
+            allCandidates = candidatesData || [];
+            
+            // Sanitize candidates data to prevent null/undefined errors
+            allCandidates = allCandidates.map(candidate => ({
+                id: candidate.id || 'unknown',
+                name: candidate.name || 'Unknown Name',
+                email: candidate.email || '',
+                phone: candidate.phone || '',
+                location: candidate.location || '',
+                experience_years: candidate.experience_years || 0,
+                skills: Array.isArray(candidate.skills) ? candidate.skills : [],
+                summary: candidate.summary || '',
+                // Add any other fields with safe defaults
+                parser_type: candidate.parser_type || 'Unknown',
+                parsed_at: candidate.parsed_at || new Date().toISOString(),
+                raw_text: candidate.raw_text || ''
+            }));
+            
+            filteredCandidates = [...allCandidates];
+            console.log('Candidates loaded successfully:', allCandidates.length);
+        } catch (error) {
+            console.error('Error loading candidates data:', error);
+            allCandidates = [];
+            filteredCandidates = [];
+        }
+
+        // Calculate and display statistics with safe null checking
+        function calculateStats() {
+            const totalCandidates = allCandidates.length;
+            
+            // Calculate new candidates this week (mock data for now)
+            const newThisWeek = Math.floor(totalCandidates * 0.2);
+            
+            // Calculate average experience with safe checking
+            let avgExperience = 0;
+            if (totalCandidates > 0) {
+                const totalExperience = allCandidates.reduce((sum, candidate) => {
+                    const exp = candidate.experience_years || 0;
+                    return sum + (typeof exp === 'number' ? exp : 0);
+                }, 0);
+                avgExperience = Math.round(totalExperience / totalCandidates);
+            }
+            
+            // Calculate unique skills with safe checking
+            const allSkills = new Set();
+            allCandidates.forEach(candidate => {
+                if (candidate.skills && Array.isArray(candidate.skills)) {
+                    candidate.skills.forEach(skill => {
+                        if (skill && typeof skill === 'string') {
+                            allSkills.add(skill);
+                        }
+                    });
+                }
+            });
+            
+            // Update DOM elements safely
+            const totalElement = document.getElementById('total-candidates');
+            const newElement = document.getElementById('new-this-week');
+            const avgElement = document.getElementById('avg-experience');
+            const skillsElement = document.getElementById('top-skills');
+            
+            if (totalElement) totalElement.textContent = totalCandidates;
+            if (newElement) newElement.textContent = newThisWeek;
+            if (avgElement) avgElement.textContent = avgExperience;
+            if (skillsElement) skillsElement.textContent = allSkills.size;
+        }
+
+        // Enhanced filter functionality with null checking
+        function applyFilters() {
+            const searchInput = document.getElementById('search-input');
+            const skillsInput = document.getElementById('skills-filter');
+            const experienceSelect = document.getElementById('experience-filter');
+            
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            const skillsFilter = skillsInput ? skillsInput.value.toLowerCase() : '';
+            const experienceFilter = experienceSelect ? experienceSelect.value : '';
+            
+            currentFilters = {
+                search: searchTerm,
+                skills: skillsFilter,
+                experience: experienceFilter
+            };
+            
+            filteredCandidates = allCandidates.filter(candidate => {
+                // Search filter with safe string checking
+                if (searchTerm) {
+                    const name = (candidate.name || '').toLowerCase();
+                    const email = (candidate.email || '').toLowerCase();
+                    if (!name.includes(searchTerm) && !email.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+                
+                // Skills filter with safe array checking
+                if (skillsFilter) {
+                    if (!candidate.skills || !Array.isArray(candidate.skills)) {
+                        return false;
+                    }
+                    const hasSkill = candidate.skills.some(skill => 
+                        skill && typeof skill === 'string' && 
+                        skill.toLowerCase().includes(skillsFilter)
+                    );
+                    if (!hasSkill) {
+                        return false;
+                    }
+                }
+                
+                // Experience filter with safe number checking
+                if (experienceFilter) {
+                    const exp = candidate.experience_years || 0;
+                    const expNum = typeof exp === 'number' ? exp : 0;
+                    switch (experienceFilter) {
+                        case '0-2': return expNum <= 2;
+                        case '3-5': return expNum >= 3 && expNum <= 5;
+                        case '6-10': return expNum >= 6 && expNum <= 10;
+                        case '10+': return expNum >= 10;
+                    }
+                }
+                
+                return true;
+            });
+            
+            updateCandidatesList();
+            updateActiveFilters();
+        }
+
+        function clearFilters() {
+            const searchInput = document.getElementById('search-input');
+            const skillsInput = document.getElementById('skills-filter');
+            const experienceSelect = document.getElementById('experience-filter');
+            
+            if (searchInput) searchInput.value = '';
+            if (skillsInput) skillsInput.value = '';
+            if (experienceSelect) experienceSelect.value = '';
+            
+            currentFilters = {};
+            filteredCandidates = [...allCandidates];
+            
+            updateCandidatesList();
+            updateActiveFilters();
+        }
+
+        function updateActiveFilters() {
+            const activeFiltersDiv = document.getElementById('active-filters');
+            if (!activeFiltersDiv) return;
+            
+            const filters = [];
+            
+            if (currentFilters.search) {
+                filters.push({
+                    label: `Search: "${currentFilters.search}"`,
+                    key: 'search'
+                });
+            }
+            
+            if (currentFilters.skills) {
+                filters.push({
+                    label: `Skills: "${currentFilters.skills}"`,
+                    key: 'skills'
+                });
+            }
+            
+            if (currentFilters.experience) {
+                filters.push({
+                    label: `Experience: ${currentFilters.experience}`,
+                    key: 'experience'
+                });
+            }
+            
+            if (filters.length > 0) {
+                activeFiltersDiv.innerHTML = filters.map(filter => `
+                    <span class="filter-tag">
+                        ${filter.label}
+                        <span class="remove-filter" onclick="removeFilter('${filter.key}')">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    </span>
+                `).join('');
+                activeFiltersDiv.style.display = 'flex';
+            } else {
+                activeFiltersDiv.style.display = 'none';
+            }
+        }
+
+        function removeFilter(filterKey) {
+            switch (filterKey) {
+                case 'search':
+                    const searchInput = document.getElementById('search-input');
+                    if (searchInput) searchInput.value = '';
+                    break;
+                case 'skills':
+                    const skillsInput = document.getElementById('skills-filter');
+                    if (skillsInput) skillsInput.value = '';
+                    break;
+                case 'experience':
+                    const experienceSelect = document.getElementById('experience-filter');
+                    if (experienceSelect) experienceSelect.value = '';
+                    break;
+            }
+            applyFilters();
+        }
+
+        function sortCandidates() {
+            const sortSelect = document.getElementById('sort-select');
+            if (!sortSelect) return;
+            
+            const sortBy = sortSelect.value;
+            
+            filteredCandidates.sort((a, b) => {
+                switch (sortBy) {
+                    case 'name':
+                        const nameA = (a.name || '').toLowerCase();
+                        const nameB = (b.name || '').toLowerCase();
+                        return nameA.localeCompare(nameB);
+                    case 'experience':
+                        const expA = a.experience_years || 0;
+                        const expB = b.experience_years || 0;
+                        return (typeof expB === 'number' ? expB : 0) - (typeof expA === 'number' ? expA : 0);
+                    case 'date':
+                        // Mock sorting by date - in real app, use actual creation date
+                        return Math.random() - 0.5;
+                    default:
+                        return 0;
+                }
+            });
+            
+            updateCandidatesList();
+        }
+
+        function updateCandidatesList() {
+            const candidatesList = document.getElementById('candidates-list');
+            if (!candidatesList) return;
+            
+            if (filteredCandidates.length === 0) {
+                candidatesList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search empty-state-icon"></i>
+                        <h3 class="text-secondary mb-3">No candidates match your filters</h3>
+                        <p class="text-secondary mb-4">Try adjusting your search criteria.</p>
+                        <button class="btn btn-primary enhanced-btn" onclick="clearFilters()">
+                            <i class="fas fa-times icon"></i> Clear Filters
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            candidatesList.innerHTML = filteredCandidates.map(candidate => {
+                const safeCandidate = {
+                    id: candidate.id || 'unknown',
+                    name: candidate.name || 'Unknown Name',
+                    email: candidate.email || '',
+                    phone: candidate.phone || '',
+                    location: candidate.location || '',
+                    experience_years: candidate.experience_years || 0,
+                    skills: Array.isArray(candidate.skills) ? candidate.skills : [],
+                    summary: candidate.summary || ''
+                };
+                
+                return `
+                    <div class="candidate-card" data-candidate-id="${safeCandidate.id}">
+                        <div class="flex-start">
+                            <div class="candidate-avatar">
+                                ${safeCandidate.name.charAt(0).toUpperCase()}
+                            </div>
+                            
+                            <div style="flex: 1;">
+                                <div class="flex-between mb-2">
+                                    <h4 class="mb-1">${safeCandidate.name}</h4>
+                                    <span class="candidate-meta">
+                                        <i class="fas fa-calendar icon"></i>
+                                        ${safeCandidate.experience_years} years exp.
+                                    </span>
+                                </div>
+                                
+                                <div class="candidate-meta mb-2">
+                                    ${safeCandidate.email ? `<i class="fas fa-envelope icon"></i> ${safeCandidate.email}` : ''}
+                                    ${safeCandidate.location ? `<i class="fas fa-map-marker-alt icon"></i> ${safeCandidate.location}` : ''}
+                                    ${safeCandidate.phone ? `<i class="fas fa-phone icon"></i> ${safeCandidate.phone}` : ''}
+                                </div>
+                                
+                                ${safeCandidate.skills.length > 0 ? `
+                                    <div class="skills-section">
+                                        ${safeCandidate.skills.slice(0, 5).map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                                        ${safeCandidate.skills.length > 5 ? `<span class="skill-tag">+${safeCandidate.skills.length - 5} more</span>` : ''}
+                                    </div>
+                                ` : ''}
+                                
+                                ${safeCandidate.summary ? `
+                                    <p class="text-secondary mt-2" style="font-size: 0.875rem; line-height: 1.4;">
+                                        ${safeCandidate.summary.substring(0, 150)}${safeCandidate.summary.length > 150 ? '...' : ''}
+                                    </p>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function exportCandidates() {
+            // Create a simple CSV export
+            if (filteredCandidates.length === 0) {
+                alert('No candidates to export.');
+                return;
+            }
+            
+            try {
+                const headers = ['Name', 'Email', 'Phone', 'Location', 'Experience (Years)', 'Skills'];
+                const csvContent = [
+                    headers.join(','),
+                    ...filteredCandidates.map(candidate => [
+                        `"${candidate.name || ''}"`,
+                        `"${candidate.email || ''}"`,
+                        `"${candidate.phone || ''}"`,
+                        `"${candidate.location || ''}"`,
+                        candidate.experience_years || 0,
+                        `"${candidate.skills && Array.isArray(candidate.skills) ? candidate.skills.join('; ') : ''}"`
+                    ].join(','))
+                ].join('\n');
+                
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'candidates_export.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Error exporting candidates. Please try again.');
+            }
+        }
+
+        // Real-time search with debouncing
+        let searchTimeout;
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    if (this.value.length === 0 || this.value.length >= 2) {
+                        applyFilters();
+                    }
+                }, 300);
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize page
+            calculateStats();
+            
+            console.log('HireAI Candidates Page initialized for user: pranamya-jain');
+            console.log('Total candidates loaded:', allCandidates.length);
+        });
+    </script>
+</body>
+</html>
