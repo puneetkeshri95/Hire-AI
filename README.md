@@ -238,30 +238,6 @@ Open your browser and navigate to: [http://localhost:5000](http://localhost:5000
 
 ---
 
-## 🎤 AI Interviewer Deep Dive
-
-### **Revolutionary Voice-Based Screening**
-
-The AI Interviewer feature represents a breakthrough in automated candidate screening, leveraging ElevenLabs' state-of-the-art conversational AI technology.
-
-#### **Key Capabilities:**
-- **Natural Conversations**: Human-like dialogue that puts candidates at ease
-- **Dynamic Questioning**: AI adapts questions based on candidate responses
-- **Professional Assessment**: Evaluates communication skills, technical knowledge, and cultural fit
-- **Efficient Screening**: Conducts meaningful interviews in under 5 minutes
-
-#### **Technical Implementation:**
-```python
-# Example: Creating an AI Interview Session
-interviewer = AIInterviewer()
-session = interviewer.create_interview_session(
-    candidate_name="John Doe",
-    job_description="Senior Python Developer",
-    interview_duration="3 minutes",
-    focus_areas=["technical_skills", "problem_solving", "communication"]
-)
-```
-
 #### **Interview Flow:**
 1. **Greeting & Introduction**: Professional welcome and candidate introduction
 2. **Background Discussion**: Questions about experience and skills
@@ -270,28 +246,6 @@ session = interviewer.create_interview_session(
 5. **Wrap-up**: Opportunity for candidate questions and next steps
 
 ---
-
-## 🔧 Configuration & Customization
-
-### **AI Model Configuration**
-```python
-# In config.py - Switch between AI providers
-AI_PROVIDER = "gemini"  # Options: "gemini", "openai", "local"
-GEMINI_MODEL = "gemini-1.5-flash"
-TEMPERATURE = 0.7
-MAX_TOKENS = 1000
-```
-
-### **Screening Parameters**
-```python
-# Customize screening criteria
-SCREENING_CONFIG = {
-    "min_experience_years": 2,
-    "required_skills_match": 0.7,
-    "location_preference": True,
-    "salary_range_consideration": True
-}
-```
 
 ### **UI Customization**
 - Modify `static/css/styles.css` for visual customization
@@ -320,30 +274,6 @@ SCREENING_CONFIG = {
 - Audit trails for all activities
 
 ---
-
-## 🐛 Troubleshooting
-
-### **Common Issues & Solutions**
-
-#### **Import Errors**
-```bash
-# Ensure correct Python interpreter
-python --version
-pip list
-
-# Reinstall dependencies
-pip install -r requirements.txt --force-reinstall
-```
-
-#### **API Key Issues**
-```bash
-# Verify environment variables
-echo $GEMINI_API_KEY
-echo $ELEVENLABS_API_KEY
-
-# Check .env file format (no spaces around =)
-GEMINI_API_KEY=your_key_here
-```
 
 #### **Resume Parsing Issues**
 - Ensure PDF files are text-based (not scanned images)
@@ -379,25 +309,7 @@ We welcome contributions from the community! Here's how you can help:
 
 ---
 
-## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2025 HireAI Team
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-```
 
 ---
 
